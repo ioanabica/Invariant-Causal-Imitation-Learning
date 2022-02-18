@@ -7,24 +7,17 @@
 ## Dependencies
 
 The code was implemented in Python 3.6 and the following packages are needed for running it:
-
 - gym==0.17.2
-
 - numpy==1.18.2
-
 - pandas==1.0.4
-
 - tensorflow==1.15.0
-
 - torch==1.6.0
-
 - tqdm==4.32.1
-
 - scipy==1.1.0
-
 - scikit-learn==0.22.2
-
 - stable-baselines==2.10.1
+
+A [`requirements.txt`](./requirements.txt) with all the dependencies is also provided.
 
 ## Downloading agents and tasks
 
