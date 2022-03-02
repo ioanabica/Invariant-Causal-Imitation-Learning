@@ -10,6 +10,7 @@ The code was implemented in Python 3.6 and the following packages are needed for
 - gym==0.17.2
 - numpy==1.18.2
 - pandas==1.0.4
+- PyYAML==5.4.1
 - tensorflow==1.15.0
 - torch==1.6.0
 - tqdm==4.32.1
