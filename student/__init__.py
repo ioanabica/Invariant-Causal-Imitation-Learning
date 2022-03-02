@@ -1,2 +1,2 @@
-from .base_student import *
-from .icil_student import *
+from .base_student import BaseStudent
+from .icil_student import softmax, flatten, ICILStudent

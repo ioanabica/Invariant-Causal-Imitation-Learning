@@ -1,7 +1,11 @@
-from .__open__ import *
-from .base_agent import *
+import os
+import importlib
+
+from .__open__ import ArgParse, oastable
+from .base_agent import BaseAgent
 
 
+# pylint: disable=no-member
 class OAStableAgent(BaseAgent):
     def __init__(self,
                  env,

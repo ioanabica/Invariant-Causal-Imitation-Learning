@@ -1,10 +1,22 @@
-from .__head__ import *
+# import gym
+import numpy as np
+# import random
+# import torch
+# import torch.nn as nn
+# import torch.optim as optim
+# from torch import nn, optim
+# import torch.nn.functional as F
+# import warnings
 
-from agent import BaseAgent, SerializableAgent
-from buffer import ReplayBuffer
-from contrib.env_wrapper import EnvWrapper
+from sklearn.metrics import accuracy_score, roc_auc_score, average_precision_score
+# from tqdm import tqdm
+
+from agent import SerializableAgent  # BaseAgent
+# from buffer import ReplayBuffer
+# from contrib.env_wrapper import EnvWrapper
 
 
+# pylint: disable=arguments-differ
 class BaseStudent(SerializableAgent):
     def __init__(self, env, trajs_paths, model_path, teacher, buffer):
         super(BaseStudent, self).__init__(
@@ -15,7 +27,6 @@ class BaseStudent(SerializableAgent):
         self.teacher = teacher
         self.buffer = buffer
         self.trajs_paths = trajs_paths
-
 
     def matchup(self):
         samples = self.buffer.sample_all()
@@ -79,7 +90,10 @@ class BaseStudent(SerializableAgent):
             for i, pair in enumerate(traj):
                 state = pair[0]
                 true_act = pair[1]
-                pred_act, pred_act_prob = self.select_action(state, eval_mode=True)
+                try:
+                    pred_act, pred_act_prob = self.select_action(state, eval_mode=True)  # pylint: disable=unexpected-keyword-arg
+                except TypeError as e:
+                    raise RuntimeError("Expected `self` to be `ICILStudent`.") from e
 
                 true_actions.append(true_act)
                 predicted_actions.append(pred_act)
@@ -91,11 +105,8 @@ class BaseStudent(SerializableAgent):
 
         return accuracy, auc_score, apr_score
 
-
     def serialize(self):
         raise NotImplementedError
 
     def deserialize(self):
         raise NotImplementedError
-
-

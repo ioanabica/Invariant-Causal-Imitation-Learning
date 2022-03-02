@@ -1,4 +1,4 @@
-from .trainable_agent import *
+from .trainable_agent import TrainableAgent
 
 
 class SerializableAgent(TrainableAgent):

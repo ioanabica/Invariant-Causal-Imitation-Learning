@@ -1,4 +1,6 @@
-from .base_buffer import *
+import numpy as np
+
+from .base_buffer import BaseBuffer
 
 
 class ReplayBuffer(BaseBuffer):

@@ -1,6 +1,6 @@
-from .base_agent         import *
-from .cuda_agent         import *
-from .oa_baseline_agent  import *
-from .oa_stable_agent    import *
-from .serializable_agent import *
-from .trainable_agent    import *
+from .base_agent         import BaseAgent
+from .cuda_agent         import CUDAAgent
+from .oa_stable_agent    import OAStableAgent
+from .serializable_agent import SerializableAgent
+from .trainable_agent    import TrainableAgent
+# from .oa_baseline_agent  import *

@@ -7,7 +7,9 @@ disable=R,C,
         raise-missing-from,
         fixme,
         unused-variable,
-        unused-argument
+        unused-argument,
+        protected-access,
+        attribute-defined-outside-init
 
 [TYPECHECK]
 generated-members=tensorflow.*,

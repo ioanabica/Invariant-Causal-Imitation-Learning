@@ -33,6 +33,7 @@ import torch.nn as nn
 EPS = 1e-6
 
 
+# pylint: disable=abstract-method, arguments-differ, redefined-builtin
 class EMALoss(torch.autograd.Function):
     @staticmethod
     def forward(ctx, input, running_ema):
@@ -44,8 +45,7 @@ class EMALoss(torch.autograd.Function):
     @staticmethod
     def backward(ctx, grad_output):
         input, running_mean = ctx.saved_tensors
-        grad = grad_output * input.exp().detach() / \
-               (running_mean + EPS) / input.shape[0]
+        grad = grad_output * input.exp().detach() / (running_mean + EPS) / input.shape[0]
         return grad, None
 
 

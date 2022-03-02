@@ -1,4 +1,13 @@
-from __head__ import *
+import csv
+import gym
+import numpy as np
+import random
+import warnings
+
+try:
+    from paths import get_trajs_path  # noqa
+except (ModuleNotFoundError, ImportError):
+    from .paths import get_trajs_path  # pylint: disable=reimported
 
 from agent import OAStableAgent
 from buffer import ReplayBuffer
@@ -41,7 +50,7 @@ def fill_buffer(trajs_path, batch_size, run_seed, traj_shift, buffer_size_in_tra
 
             for traj in trajs:
                 for i in range(len(traj) - 2):
-                        pairs_env.append((traj[i][0], traj[i][1], traj[i + 1][0], traj[i][2]))
+                    pairs_env.append((traj[i][0], traj[i][1], traj[i + 1][0], traj[i][2]))
 
             all_pairs += pairs_env
         random.shuffle(all_pairs)

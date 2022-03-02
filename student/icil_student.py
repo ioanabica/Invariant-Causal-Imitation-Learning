@@ -1,5 +1,21 @@
-from .base_student import *
+import numpy as np
+
+# import gym
+# import random
+import torch
+import torch.nn as nn
+import torch.optim as optim
+# from torch import nn, optim
+import torch.nn.functional as F
+# import warnings
+
+from tqdm import tqdm
+
+# from buffer import ReplayBuffer
+# from contrib.env_wrapper import EnvWrapper
+
 from agent import CUDAAgent
+from .base_student import BaseStudent
 
 
 def softmax(x):
@@ -11,6 +27,7 @@ def flatten(_list):
     return [item for sublist in _list for item in sublist]
 
 
+# pylint: disable=arguments-differ
 class ICILStudent(BaseStudent, CUDAAgent):
     def __init__(self,
                  env,
@@ -156,7 +173,7 @@ class ICILStudent(BaseStudent, CUDAAgent):
         disc_entropy_entropy = torch.mean(F.softmax(predicted_env, dim=1)
                                           * F.log_softmax(predicted_env, dim=1))
 
-        # 3. Enc discriminator cross-entropy loss for training environment clasifier
+        # 3. Enc discriminator cross-entropy loss for training environment classifier
         predicted_env = self.env_discriminator(causal_rep.detach())
         env_discriminator_loss = nn.CrossEntropyLoss()(predicted_env, env_ids)
 

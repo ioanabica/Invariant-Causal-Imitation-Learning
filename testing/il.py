@@ -1,17 +1,27 @@
-from __head__ import *
+import argparse
+import gym
+import numpy as np
+import os
+import pandas as pd
+import pickle
+import yaml
 
-from agent import OAStableAgent
+try:
+    from paths import get_model_path, get_trajs_path  # noqa
+except (ModuleNotFoundError, ImportError):
+    from .paths import get_model_path, get_trajs_path  # pylint: disable=reimported
+
 from contrib.energy_model import EnergyModel
 from contrib.env_wrapper import EnvWrapper, get_test_mult_factors
 from network import (
     StudentNetwork, FeaturesEncoder, FeaturesDecoder, ObservationsDecoder, EnvDiscriminator, MineNetwork)
 from student import (
-    BaseStudent,
     ICILStudent,
 )
 from testing.train_utils import fill_buffer, save_results, make_agent
 
 
+# pylint: disable=redefined-outer-name
 def make_student(run_seed, config):
     env = gym.make(config['ENV'])
     trajs_path = get_trajs_path(config['ENV'], 'student_' + config['ALG'], env_id='student', run_seed=run_seed)
@@ -21,9 +31,9 @@ def make_student(run_seed, config):
     action_dim = env.action_space.n
     num_training_envs = config['NUM_TRAINING_ENVS']
 
-    run_seed = run_seed
+    # run_seed = run_seed
     batch_size = config['BATCH_SIZE']
-    teacher = make_agent(config['ENV'], config['EXPERT_ALG'], config['NUM_TRAINING_ENVS']);
+    teacher = make_agent(config['ENV'], config['EXPERT_ALG'], config['NUM_TRAINING_ENVS'])
     teacher.load_pretrained()
 
     buffer = fill_buffer(trajs_path=teacher.trajs_paths, batch_size=batch_size, run_seed=run_seed,

@@ -1,19 +1,9 @@
-import argparse
-import csv
-import gym
-import numpy as np
 import os
-import sys
-import pandas as pd
-import pickle
-import random
-import warnings
-import yaml
-
-import numpy as np
-
 from pathlib import Path
+import sys
+
 sys.path.append(os.getcwd())
+
 
 def get_model_path(env_name, actor, run_seed=None):
     return get_path(env_name, actor, 'model.pkl', run_seed)
@@ -26,7 +16,7 @@ def get_trajs_path(env_name, actor, env_id, run_seed=None):
 def get_path(env_name, actor, suffix, run_seed=None):
     dir_path = 'volume/' + env_name
     fullpath = dir_path + '/' + actor + \
-               (('_' + str(run_seed)) if run_seed is not None else '') + '_' + suffix
+        (('_' + str(run_seed)) if run_seed is not None else '') + '_' + suffix
 
     Path(dir_path).mkdir(parents=True, exist_ok=True)
 

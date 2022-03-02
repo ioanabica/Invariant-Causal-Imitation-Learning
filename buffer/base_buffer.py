@@ -1,4 +1,4 @@
-from .__head__ import *
+import numpy as np
 
 
 class BaseBuffer:

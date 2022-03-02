@@ -1,4 +1,4 @@
-from .base_agent import *
+from .base_agent import BaseAgent
 
 
 class TrainableAgent(BaseAgent):

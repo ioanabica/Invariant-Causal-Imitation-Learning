@@ -1,6 +1,15 @@
-from __head__ import *
+import argparse
+import gym
+import numpy as np
+import os
+import pandas as pd
+import pickle
 
-from agent import OAStableAgent
+try:
+    from paths import get_model_path  # noqa
+except (ModuleNotFoundError, ImportError):
+    from .paths import get_model_path  # pylint: disable=reimported
+
 from contrib.energy_model import EnergyModel
 from network import (
     StudentNetwork, FeaturesEncoder, FeaturesDecoder, ObservationsDecoder, EnvDiscriminator, MineNetwork)
@@ -11,6 +20,7 @@ from student import (
 from testing.train_utils import fill_buffer, save_results_mimic, make_agent
 
 
+# pylint: disable=redefined-outer-name
 def make_student(
         run_seed: int, config
 ) -> BaseStudent:
@@ -21,14 +31,14 @@ def make_student(
     action_dim = config['ACTION_DIM']
     num_training_envs = config['NUM_TRAINING_ENVS']
 
-    run_seed = run_seed
+    # run_seed = run_seed
     batch_size = config['BATCH_SIZE']
     buffer_size_in_trajs = config['NUM_TRAJS_GIVEN']
 
     adam_alpha = config['ADAM_ALPHA']
 
     env = gym.make('CartPole-v1')  # This is needed such the student code doesn't break.
-    teacher = make_agent('CartPole-v1', 'dqn', config['NUM_TRAINING_ENVS']);
+    teacher = make_agent('CartPole-v1', 'dqn', config['NUM_TRAINING_ENVS'])
     teacher.load_pretrained()
 
     buffer = fill_buffer(trajs_path=config['TRAIN_TRAJ_PATH'], batch_size=batch_size, run_seed=run_seed,
@@ -105,7 +115,7 @@ if __name__ == '__main__':
 
     config = {
         'ENV': 'MIMIC',
-        'ALG': 'ICILStudeent',
+        'ALG': 'ICILStudent',
         'NUM_TRAINING_ENVS': 2,
 
         'REP_SIZE': 32,

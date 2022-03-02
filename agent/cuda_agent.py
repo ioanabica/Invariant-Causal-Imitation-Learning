@@ -1,4 +1,6 @@
-from .trainable_agent import *
+import torch
+
+from .trainable_agent import TrainableAgent
 
 
 class CUDAAgent(TrainableAgent):
