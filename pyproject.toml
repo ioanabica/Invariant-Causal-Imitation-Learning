@@ -1,0 +1,9 @@
+[tool.black]
+line-length = 120
+extend-exclude = '''
+^/contrib/baselines_zoo
+'''
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
