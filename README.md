@@ -4,27 +4,25 @@
 
 #### Neural Information Processing Systems (NeurIPS) 2021
 
+
+
 ## Dependencies
 
 The code was implemented in Python 3.6 and the following packages are needed for running it:
-
 - gym==0.17.2
-
 - numpy==1.18.2
-
 - pandas==1.0.4
-
+- PyYAML==5.4.1
 - tensorflow==1.15.0
-
 - torch==1.6.0
-
 - tqdm==4.32.1
-
 - scipy==1.1.0
-
 - scikit-learn==0.22.2
-
 - stable-baselines==2.10.1
+
+A [`requirements.txt`](./requirements.txt) with all the dependencies is also provided.
+
+
 
 ## Downloading agents and tasks
 
@@ -40,7 +38,11 @@ The RL agents and tasks can be downloaded from [here](https://drive.google.com/d
     └── CartPole-v1/*
 ```
 
+
+
 ## Running and evaluating the model:
+
+### OpenAI Gym
 
 The control tasks used for experiments are from OpenAI gym [1]. Each control task is associated with a true reward 
 function (unknown to the imitation algorithm). In each case, the “expert” demonstrator can be obtained by using a 
@@ -70,7 +72,6 @@ Outputs:
 ```
 python testing/il.py  --env='CartPole-v1' --num_trajectories=20 --trial=0 
 ```
- 
 
 #### References
 
@@ -82,7 +83,18 @@ and Wojciech Zaremba. Openai gym. OpenAI, 2016
 [3] Ashley Hill, Antonin Raffin, Maximilian Ernestus, Adam Gleave, Anssi Kanervisto, Rene Traore, Prafulla Dhariwal, Christopher Hesse, Oleg Klimov, Alex Nichol, Matthias Plappert,
 Alec Radford, John Schulman, Szymon Sidor, and Yuhuai Wu. Stable baselines. https://github.com/hill-a/stable-baselines, 2018.
 
- 
+### MIMIC-III
+
+In order to run the experiments on the MIMIC-III dataset, you will need to get [MIMIC-III access credentials](https://mimic.mit.edu/docs/gettingstarted/). The preprocessed files can be obtained by contacting the authors (you must confirm your MIMIC access credentials). Place the files under `volume/MIMIC`.
+
+#### Example usage
+
+```
+python testing/il_mimic.py --trial=0
+``` 
+
+
+
 ### Citation
 
 If you use this code, please cite:

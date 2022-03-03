@@ -1,6 +1,8 @@
-from .base_network import *
+import torch
+import torch.nn as nn
 
 
+# pylint: disable=redefined-builtin
 class FeaturesEncoder(nn.Module):
     def __init__(self, input_size, representation_size, width):
         super().__init__()

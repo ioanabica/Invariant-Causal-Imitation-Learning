@@ -1,4 +1,6 @@
-from .base_network import *
+import torch.nn as nn
+
+from .base_network import BaseNetwork
 
 
 class StudentNetwork(BaseNetwork):

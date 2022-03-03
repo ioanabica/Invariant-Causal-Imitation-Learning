@@ -25,14 +25,16 @@ SOFTWARE.
 
 """
 
-import numpy as np
 import math
+
+import numpy as np
 import torch
 import torch.nn as nn
 
 EPS = 1e-6
 
 
+# pylint: disable=abstract-method, arguments-differ, redefined-builtin
 class EMALoss(torch.autograd.Function):
     @staticmethod
     def forward(ctx, input, running_ema):
@@ -44,8 +46,7 @@ class EMALoss(torch.autograd.Function):
     @staticmethod
     def backward(ctx, grad_output):
         input, running_mean = ctx.saved_tensors
-        grad = grad_output * input.exp().detach() / \
-               (running_mean + EPS) / input.shape[0]
+        grad = grad_output * input.exp().detach() / (running_mean + EPS) / input.shape[0]
         return grad, None
 
 
@@ -86,7 +87,7 @@ class CustomSequential(nn.Sequential):
 
 
 class MineNetwork(nn.Module):
-    def __init__(self, x_dim, z_dim, width, loss='mine', alpha=0.01, method=None):
+    def __init__(self, x_dim, z_dim, width, loss="mine", alpha=0.01, method=None):
         super().__init__()
         self.running_mean = 0
         self.loss = loss
@@ -95,7 +96,7 @@ class MineNetwork(nn.Module):
 
         T = Seq(x_dim, z_dim, width)
 
-        if method == 'concat':
+        if method == "concat":
             if isinstance(T, nn.Sequential):
                 self.T = CustomSequential(ConcatLayer(), *T)
             else:
@@ -110,14 +111,12 @@ class MineNetwork(nn.Module):
         t = self.T(x, z).mean()
         t_marg = self.T(x, z_marg)
 
-        if self.loss in ['mine']:
-            second_term, self.running_mean = ema_loss(
-                t_marg, self.running_mean, self.alpha)
-        elif self.loss in ['fdiv']:
+        if self.loss in ["mine"]:
+            second_term, self.running_mean = ema_loss(t_marg, self.running_mean, self.alpha)
+        elif self.loss in ["fdiv"]:
             second_term = torch.exp(t_marg - 1).mean()
-        elif self.loss in ['mine_biased']:
-            second_term = torch.logsumexp(
-                t_marg, 0) - math.log(t_marg.shape[0])
+        elif self.loss in ["mine_biased"]:
+            second_term = torch.logsumexp(t_marg, 0) - math.log(t_marg.shape[0])
 
         return -t + second_term
 
@@ -135,11 +134,14 @@ class MineNetwork(nn.Module):
 class Seq(nn.Module):
     def __init__(self, x_dim, z_dim, width):
         super().__init__()
-        self.layers = CustomSequential(ConcatLayer(), nn.Linear(x_dim + z_dim, width),
-                                       nn.ELU(),
-                                       nn.Linear(width, width),
-                                       nn.ELU(),
-                                       nn.Linear(width, 1))
+        self.layers = CustomSequential(
+            ConcatLayer(),
+            nn.Linear(x_dim + z_dim, width),
+            nn.ELU(),
+            nn.Linear(width, width),
+            nn.ELU(),
+            nn.Linear(width, 1),
+        )
 
     def forward(self, x, z):
         return self.layers(x, z)

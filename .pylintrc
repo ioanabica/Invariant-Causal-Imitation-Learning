@@ -1,0 +1,20 @@
+[MASTER]
+init-hook='import sys; sys.path.extend(["./", "./contrib/baselines_zoo"])'
+extension-pkg-whitelist=numpy
+
+[MESSAGES CONTROL]
+disable=R,C,
+        raise-missing-from,
+        fixme,
+        unused-variable,
+        unused-argument,
+        protected-access,
+        attribute-defined-outside-init
+
+[TYPECHECK]
+generated-members=tensorflow.*,
+                  torch.*
+ignored-modules=tensorflow.compat,
+                tensorflow.keras,
+                tensorflow.python.ops,
+                scipy.special

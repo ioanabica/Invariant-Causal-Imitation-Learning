@@ -1,5 +1,5 @@
-from gym import core
 import numpy as np
+from gym import core
 from numpy import linalg as LA
 
 
@@ -12,7 +12,7 @@ def get_test_mult_factors(p):
     return w
 
 
-class EnvWrapper(core.Env):
+class EnvWrapper(core.Env):  # pylint: disable=abstract-method
     def __init__(self, env, mult_factor, idx, seed):
         self._noise = 0.001
         self._mult_factor = mult_factor
@@ -32,23 +32,24 @@ class EnvWrapper(core.Env):
         obs = np.concatenate([observations + obs_noise, spur_corr, [self._idx]])
         return obs
 
-    def seed(self, seed):
+    def seed(self, seed):  # pylint: disable=signature-differs
         self._true_action_space.seed(seed)
         self._norm_action_space.seed(seed)
         self._observation_space.seed(seed)
 
-    def step(self, action):
-        reward = 0
+    # NOTE: Unused
+    # def step(self, action):
+    #     reward = 0
 
-        for _ in range(self._frame_skip):
-            time_step = self._env.step(action)
-            reward += time_step.reward or 0
-            done = time_step.last()
-            if done:
-                break
-        obs = self._get_obs(time_step)
-        extra["discount"] = time_step.discount
-        return obs, reward, done, extra
+    #     for _ in range(self._frame_skip):
+    #         time_step = self._env.step(action)
+    #         reward += time_step.reward or 0
+    #         done = time_step.last()
+    #         if done:
+    #             break
+    #     obs = self._get_obs(time_step)
+    #     extra["discount"] = time_step.discount
+    #     return obs, reward, done, extra
 
     def reset(self):
         time_step = self._env.reset()

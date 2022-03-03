@@ -1,4 +1,4 @@
-from .__head__ import *
+import numpy as np
 
 
 class BaseAgent:
@@ -70,35 +70,36 @@ class BaseAgent:
 
         for episode_index in range(num_episodes):
             if episode_index % 100 == 0:
-                print('episode: %d' % episode_index)
+                print("episode: %d" % episode_index)
 
             traj, retvrn = self.rollout()
 
             trajs += [traj]
             returns += [retvrn]
 
-        np.save(self.trajs_paths, {'trajs': trajs, 'returns': returns})
+        np.save(self.trajs_paths, {"trajs": trajs, "returns": returns})
 
         return np.mean(returns), np.std(returns)
 
-    def test_env(self, num_episodes, env_id, noise, mult_factor, eval_il):
-        trajs = []
-        returns = []
+    # NOTE: Unused.
+    # def test_env(self, num_episodes, env_id, noise, mult_factor, eval_il):
+    #     trajs = []
+    #     returns = []
 
-        env_wrapper = EnvWrapper(env=self.env, noise=noise, mult_factor=mult_factor,
-                                 idx=env_id, seed=1)
+    #     env_wrapper = EnvWrapper(env=self.env, noise=noise, mult_factor=mult_factor,
+    #                              idx=env_id, seed=1)
 
-        for episode_index in range(num_episodes):
-            if episode_index % 100 == 0:
-                print('episode: %d' % episode_index)
+    #     for episode_index in range(num_episodes):
+    #         if episode_index % 100 == 0:
+    #             print('episode: %d' % episode_index)
 
-            traj, retvrn = self.rollout_env(env_wrapper, eval_il)
+    #         traj, retvrn = self.rollout_env(env_wrapper, eval_il)
 
-            trajs += [traj]
-            returns += [retvrn]
+    #         trajs += [traj]
+    #         returns += [retvrn]
 
-        print(self.trajs_paths[env_id])
+    #     print(self.trajs_paths[env_id])
 
-        np.save(self.trajs_paths[env_id], {'trajs': trajs, 'returns': returns})
+    #     np.save(self.trajs_paths[env_id], {'trajs': trajs, 'returns': returns})
 
-        return np.mean(returns), np.std(returns)
+    #     return np.mean(returns), np.std(returns)
