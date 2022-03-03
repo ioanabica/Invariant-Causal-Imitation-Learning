@@ -1,8 +1,4 @@
-# import gym
 import numpy as np
-# import torch
-
-# from contrib.env_wrapper import EnvWrapper
 
 
 class BaseAgent:
@@ -74,14 +70,14 @@ class BaseAgent:
 
         for episode_index in range(num_episodes):
             if episode_index % 100 == 0:
-                print('episode: %d' % episode_index)
+                print("episode: %d" % episode_index)
 
             traj, retvrn = self.rollout()
 
             trajs += [traj]
             returns += [retvrn]
 
-        np.save(self.trajs_paths, {'trajs': trajs, 'returns': returns})
+        np.save(self.trajs_paths, {"trajs": trajs, "returns": returns})
 
         return np.mean(returns), np.std(returns)
 

@@ -1,20 +1,12 @@
 import numpy as np
-
-# import gym
-# import random
 import torch
 import torch.nn as nn
-import torch.optim as optim
-# from torch import nn, optim
 import torch.nn.functional as F
-# import warnings
-
+import torch.optim as optim
 from tqdm import tqdm
 
-# from buffer import ReplayBuffer
-# from contrib.env_wrapper import EnvWrapper
-
 from agent import CUDAAgent
+
 from .base_student import BaseStudent
 
 
@@ -29,24 +21,25 @@ def flatten(_list):
 
 # pylint: disable=arguments-differ
 class ICILStudent(BaseStudent, CUDAAgent):
-    def __init__(self,
-                 env,
-                 trajs_paths,
-                 model_path,
-                 num_training_envs,
-                 teacher,
-                 causal_features_encoder,
-                 noise_features_encoders,
-                 causal_features_decoder,
-                 noise_features_decoders,
-                 observations_decoder,
-                 env_discriminator,
-                 policy_network,
-                 energy_model,
-                 mine_network,
-                 buffer,
-                 adam_alpha,
-                 ):
+    def __init__(
+        self,
+        env,
+        trajs_paths,
+        model_path,
+        num_training_envs,
+        teacher,
+        causal_features_encoder,
+        noise_features_encoders,
+        causal_features_decoder,
+        noise_features_decoders,
+        observations_decoder,
+        env_discriminator,
+        policy_network,
+        energy_model,
+        mine_network,
+        buffer,
+        adam_alpha,
+    ):
         super(ICILStudent, self).__init__(
             env=env,
             trajs_paths=trajs_paths,
@@ -74,24 +67,26 @@ class ICILStudent(BaseStudent, CUDAAgent):
 
         self.adam_alpha = adam_alpha
 
-        noise_models_params = (
-                flatten([list(noise_features_encoder.parameters()) for noise_features_encoder in
-                         self.noise_features_encoders])
-                + flatten(
-            [list(noise_features_decoder.parameters()) for noise_features_decoder in self.noise_features_decoders]))
+        noise_models_params = flatten(
+            [list(noise_features_encoder.parameters()) for noise_features_encoder in self.noise_features_encoders]
+        ) + flatten(
+            [list(noise_features_decoder.parameters()) for noise_features_decoder in self.noise_features_decoders]
+        )
 
-        self.rep_optimizer = optim.Adam(list(causal_features_encoder.parameters()) +
-                                        list(causal_features_decoder.parameters()) +
-                                        list(observations_decoder.parameters()) +
-                                        noise_models_params +
-                                        list(policy_network.parameters()),
-                                        lr=self.adam_alpha)
+        self.rep_optimizer = optim.Adam(
+            list(causal_features_encoder.parameters())
+            + list(causal_features_decoder.parameters())
+            + list(observations_decoder.parameters())
+            + noise_models_params
+            + list(policy_network.parameters()),
+            lr=self.adam_alpha,
+        )
 
-        self.policy_opt = optim.Adam(list(causal_features_encoder.parameters()) + list(policy_network.parameters()),
-                                     lr=self.adam_alpha)
+        self.policy_opt = optim.Adam(
+            list(causal_features_encoder.parameters()) + list(policy_network.parameters()), lr=self.adam_alpha
+        )
 
-        self.disc_opt = optim.Adam(list(env_discriminator.parameters()),
-                                   lr=self.adam_alpha)
+        self.disc_opt = optim.Adam(list(env_discriminator.parameters()), lr=self.adam_alpha)
 
         self.mine_opt = optim.Adam(self.mine_network.parameters(), lr=1e-4)
 
@@ -102,7 +97,7 @@ class ICILStudent(BaseStudent, CUDAAgent):
         action = self.policy_network(causal_rep).argmax()
         action = action.detach().cpu().numpy()
 
-        if (eval_mode):
+        if eval_mode:
             action = self.policy_network(causal_rep).detach().cpu().numpy()
             num_actions = action.shape[0]
             action = np.argmax(action)
@@ -132,8 +127,16 @@ class ICILStudent(BaseStudent, CUDAAgent):
     def _update_networks(self):
         samples = self.buffer.sample()
 
-        ce_loss, disc_entropy, next_state_pred_loss, next_state_energy_loss, expert_samples_energy, mi_loss, env_discriminator_loss, mine_loss = self._compute_loss(
-            samples)
+        (
+            ce_loss,
+            disc_entropy,
+            next_state_pred_loss,
+            next_state_energy_loss,
+            expert_samples_energy,
+            mi_loss,
+            env_discriminator_loss,
+            mine_loss,
+        ) = self._compute_loss(samples)
 
         rep_loss = disc_entropy + next_state_pred_loss + mi_loss
         policy_loss = ce_loss + next_state_energy_loss
@@ -154,10 +157,10 @@ class ICILStudent(BaseStudent, CUDAAgent):
         self.mine_opt.step()
 
     def _compute_loss(self, samples):
-        state = torch.FloatTensor(samples['state']).to(self.device)
-        action = torch.LongTensor(samples['action']).to(self.device)
-        next_state = torch.FloatTensor(samples['next_state']).to(self.device)
-        env_ids = torch.LongTensor(samples['env']).to(self.device)
+        state = torch.FloatTensor(samples["state"]).to(self.device)
+        action = torch.LongTensor(samples["action"]).to(self.device)
+        next_state = torch.FloatTensor(samples["next_state"]).to(self.device)
+        env_ids = torch.LongTensor(samples["env"]).to(self.device)
 
         causal_rep = self.causal_features_encoder(state)
 
@@ -170,8 +173,7 @@ class ICILStudent(BaseStudent, CUDAAgent):
 
         # 2. Env discriminator entropy loss for causal representation learning
         predicted_env = self.env_discriminator(causal_rep)
-        disc_entropy_entropy = torch.mean(F.softmax(predicted_env, dim=1)
-                                          * F.log_softmax(predicted_env, dim=1))
+        disc_entropy_entropy = torch.mean(F.softmax(predicted_env, dim=1) * F.log_softmax(predicted_env, dim=1))
 
         # 3. Enc discriminator cross-entropy loss for training environment classifier
         predicted_env = self.env_discriminator(causal_rep.detach())
@@ -185,7 +187,7 @@ class ICILStudent(BaseStudent, CUDAAgent):
         for env_id in range(self.num_training_envs):
             env_samples_idx = torch.where(env_ids == env_id)[0]
 
-            if (env_samples_idx.shape[0] == 0):
+            if env_samples_idx.shape[0] == 0:
                 env_samples_idx = torch.LongTensor([0]).to(self.device)
 
             state_env = state[env_samples_idx]
@@ -213,23 +215,31 @@ class ICILStudent(BaseStudent, CUDAAgent):
             for env_id in range(self.num_training_envs):
                 env_samples_idx = torch.where(env_ids == env_id)[0]
 
-                if (env_samples_idx.shape[0] == 0):
+                if env_samples_idx.shape[0] == 0:
                     env_samples_idx = torch.LongTensor([0]).to(self.device)
 
                 imitation_action_env = imitation_action[env_samples_idx]
                 noise_rep_env = noise_rep[env_samples_idx]
 
-                next_state_noise_rep_env = self.noise_features_decoders[env_id](noise_rep_env,
-                                                                                imitation_action_env)
+                next_state_noise_rep_env = self.noise_features_decoders[env_id](noise_rep_env, imitation_action_env)
                 next_state_noise_rep_energy[env_samples_idx] = next_state_noise_rep_env
 
             next_state_causal_rep_energy = self.causal_features_decoder(causal_rep, imitation_action)
-            predicted_next_state_energy = self.observations_decoder(next_state_causal_rep_energy,
-                                                                    next_state_noise_rep_energy)
+            predicted_next_state_energy = self.observations_decoder(
+                next_state_causal_rep_energy, next_state_noise_rep_energy
+            )
 
         expert_samples_energy = self.energy_model.forward(state).mean()
         next_state_energy_loss = self.energy_model.forward(predicted_next_state_energy).mean()
         #############################################################################################################
 
-        return ce_loss, disc_entropy_entropy, next_state_pred_loss, next_state_energy_loss, expert_samples_energy, mi_loss, \
-               env_discriminator_loss, mine_loss
+        return (
+            ce_loss,
+            disc_entropy_entropy,
+            next_state_pred_loss,
+            next_state_energy_loss,
+            expert_samples_energy,
+            mi_loss,
+            env_discriminator_loss,
+            mine_loss,
+        )

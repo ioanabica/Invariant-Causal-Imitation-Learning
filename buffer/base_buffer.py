@@ -16,7 +16,15 @@ class BaseBuffer:
         self.ptr = 0
         self.size = 0
 
-    def store(self, state, action, reward, next_state, done, env, ):
+    def store(
+        self,
+        state,
+        action,
+        reward,
+        next_state,
+        done,
+        env,
+    ):
         self.state_buf[self.ptr] = state
         self.action_buf[self.ptr] = action
         self.reward_buf[self.ptr] = reward

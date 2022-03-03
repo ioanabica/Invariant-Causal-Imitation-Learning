@@ -1,5 +1,5 @@
-from gym import core
 import numpy as np
+from gym import core
 from numpy import linalg as LA
 
 
@@ -12,7 +12,7 @@ def get_test_mult_factors(p):
     return w
 
 
-class EnvWrapper(core.Env):
+class EnvWrapper(core.Env):  # pylint: disable=abstract-method
     def __init__(self, env, mult_factor, idx, seed):
         self._noise = 0.001
         self._mult_factor = mult_factor

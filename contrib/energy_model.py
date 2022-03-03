@@ -24,18 +24,27 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 import torch
-from torch import nn, autograd
 import torch.optim as optim
-
+from torch import autograd, nn
 from tqdm import tqdm
 
 
 class EnergyModel:
-
-    def __init__(self, in_dim, width, batch_size, adam_alpha, buffer,
-                 sgld_buffer_size, sgld_learn_rate, sgld_noise_coef, sgld_num_steps, sgld_reinit_freq, ):
+    def __init__(
+        self,
+        in_dim,
+        width,
+        batch_size,
+        adam_alpha,
+        buffer,
+        sgld_buffer_size,
+        sgld_learn_rate,
+        sgld_noise_coef,
+        sgld_num_steps,
+        sgld_reinit_freq,
+    ):
         super().__init__()
-        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
         self.in_dim = in_dim
         self.width = width
@@ -50,13 +59,12 @@ class EnergyModel:
         self.sgld_num_steps = sgld_num_steps
         self.sgld_reinit_freq = sgld_reinit_freq
 
-        self.energy_network = EnergyModelNetworkMLP(in_dim=in_dim, out_dim=1, l_hidden=(self.width, self.width),
-                                                    activation='relu',
-                                                    out_activation='linear')
+        self.energy_network = EnergyModelNetworkMLP(
+            in_dim=in_dim, out_dim=1, l_hidden=(self.width, self.width), activation="relu", out_activation="linear"
+        )
         self.energy_network.to(self.device)
 
-        self.optimizer = optim.Adam(self.energy_network.parameters(),
-                                    lr=self.adam_alpha)
+        self.optimizer = optim.Adam(self.energy_network.parameters(), lr=self.adam_alpha)
 
     def forward(self, x):
         z = self.energy_network(x)
@@ -69,7 +77,7 @@ class EnergyModel:
     def _update_energy_model(self):
         samples = self.buffer.sample()
 
-        pos_x = torch.FloatTensor(samples['state']).to(self.device)
+        pos_x = torch.FloatTensor(samples["state"]).to(self.device)
         neg_x = self._sample_via_sgld()
 
         self.optimizer.zero_grad()
@@ -77,7 +85,7 @@ class EnergyModel:
         neg_out = self.energy_network(neg_x)
 
         contrastive_loss = (pos_out - neg_out).mean()
-        reg_loss = (pos_out ** 2 + neg_out ** 2).mean()
+        reg_loss = (pos_out**2 + neg_out**2).mean()
         loss = contrastive_loss + reg_loss
 
         loss.backward()
@@ -129,28 +137,28 @@ class EnergyModel:
 
 # Fully Connected Network
 def get_activation(s_act):
-    if s_act == 'relu':
+    if s_act == "relu":
         return nn.ReLU(inplace=True)
-    elif s_act == 'sigmoid':
+    elif s_act == "sigmoid":
         return nn.Sigmoid()
-    elif s_act == 'softplus':
+    elif s_act == "softplus":
         return nn.Softplus()
-    elif s_act == 'linear':
+    elif s_act == "linear":
         return None
-    elif s_act == 'tanh':
+    elif s_act == "tanh":
         return nn.Tanh()
-    elif s_act == 'leakyrelu':
+    elif s_act == "leakyrelu":
         return nn.LeakyReLU(0.2, inplace=True)
-    elif s_act == 'softmax':
+    elif s_act == "softmax":
         return nn.Softmax(dim=1)
     else:
-        raise ValueError(f'Unexpected activation: {s_act}')
+        raise ValueError(f"Unexpected activation: {s_act}")
 
 
 class EnergyModelNetworkMLP(nn.Module):
     """fully-connected network"""
 
-    def __init__(self, in_dim, out_dim, l_hidden=(50,), activation='sigmoid', out_activation='linear'):
+    def __init__(self, in_dim, out_dim, l_hidden=(50,), activation="sigmoid", out_activation="linear"):
         super(EnergyModelNetworkMLP, self).__init__()
         l_neurons = tuple(l_hidden) + (out_dim,)
         if isinstance(activation, str):
